@@ -38,11 +38,13 @@ app.post("/check_card", async (req, res) => {
     const data = await response.json();
     return res.json(data);
   } catch (err) {
-    console.error(err);
+    console.error("Erro:", err);
     res.status(500).json({ error: "Erro ao validar cartão" });
   }
 });
 
-app.listen(3000, () => {
-  console.log("Servidor rodando na porta 3000");
+// 🚀 Porta dinâmica exigida pelo Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
