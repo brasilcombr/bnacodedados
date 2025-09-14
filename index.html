@@ -278,5 +278,98 @@ wrap.addEventListener("touchmove",e=>{
 });
 wrap.addEventListener("touchend",()=>{card.style.transform="";});
 </script>
+  <!-- Mercado Pago JS SDK (v2) -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+
+<script>
+/* --- CONFIG --- */
+const MP_PUBLIC_KEY = 'APP_USR-4eddada1-fad9-4f92-b7de-45088d6dc089'; // cole aqui a Public Key (TEST-... ou APP_USR-...)
+/* --- init SDK --- */
+const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+
+/* adaptações para o seu formulário atual: IDs que seu HTML usa:
+   card-num, holder, exp, cvv, pay (botão)
+*/
+const payBtn = document.getElementById('pay');
+
+function getCardDataFromForm(){
+  const number = document.getElementById('card-num').value.replace(/\s/g,'');
+  const exp = (document.getElementById('exp').value || '').split('/');
+  const month = exp[0] || '';
+  const year = exp[1] ? '20' + exp[1] : '';
+  const cardholderName = document.getElementById('holder').value;
+  const securityCode = document.getElementById('cvv').value;
+  return { number, month, year, cardholderName, securityCode };
+}
+
+/* função para criar token — API do SDK pode variar por versão.
+   Se mp.card.create não existir na versão que carregar, consulte a doc
+   ou use o Card Form Brick (recomendado). */
+async function createCardToken(card){
+  // adaptação genérica — pode falhar se SDK versão diferente.
+  // Se der erro, eu te ajudo a trocar para o Brick/Fields.
+  try {
+    const resp = await mp.card.create({
+      cardNumber: card.number,
+      cardholderName: card.cardholderName,
+      cardExpirationMonth: card.month,
+      cardExpirationYear: card.year,
+      securityCode: card.securityCode
+    });
+    // dependendo da versão resp pode ficar em outro formato
+    return resp.id || resp.card_token || (resp.response && resp.response.id);
+  } catch(err) {
+    console.error('Erro ao criar token (mp.card.create):', err);
+    throw err;
+  }
+}
+
+payBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+  // validações locais mínimas (você já tem validações Luhn etc)
+  const card = getCardDataFromForm();
+  if(!card.number || !card.month || !card.year || !card.cardholderName || !card.securityCode){
+    alert('Preencha todos os campos do cartão corretamente.');
+    return;
+  }
+
+  try {
+    // cria token no MP (fronend)
+    const token = await createCardToken(card);
+    if(!token){
+      alert('Não foi possível gerar token do cartão (ver console).');
+      return;
+    }
+
+    // envia SOMENTE o token ao backend seguro
+    const resp = await fetch('https://SEU_BACKEND_PUBLIC_URL/process_payment', { // troque para sua URL
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        token,
+        transaction_amount: 100.00, // valor de exemplo (em reais; backend aceita formato decimal)
+        description: 'Compra via site',
+        installments: 1,
+        payer: { email: 'cliente@exemplo.com' }
+      })
+    });
+
+    const json = await resp.json();
+    console.log('Resposta do backend:', json);
+
+    if(json && json.ok){
+      // success flow (UX)
+      // você pode redirecionar, mostrar mensagem, etc
+      alert('Pagamento recebido — verifique dashboard do Mercado Pago para status.');
+    } else {
+      alert('Erro no processamento do pagamento. Veja console para detalhes.');
+    }
+  } catch(err) {
+    console.error(err);
+    alert('Erro ao processar (ver console).');
+  }
+});
+</script>
+
 </body>
 </html>
