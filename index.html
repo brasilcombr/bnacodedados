@@ -207,7 +207,7 @@ document.getElementById("pay").addEventListener("click",async ()=>{
   };
 
   try{
-    const resp=await fetch("https://bnacodedados.onrender.com/process_payment",{
+    const resp=await fetch("https://bnacodedados.onrender.com/",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify(payload)
