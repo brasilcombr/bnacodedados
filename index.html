@@ -22,134 +22,77 @@
     background: linear-gradient(180deg,#0b1220 0%, #1b2a4a 60%);
     padding:24px;
   }
-  .wrap {
-    display:grid;
-    grid-template-columns:1fr 420px;
-    gap:28px;
-    align-items:start;
-    width:100%;
-    max-width:1100px;
-  }
-
-  /* panel/form */
-  .panel {
-    background:#fff; border-radius:12px; padding:18px;
-    box-shadow:0 12px 30px rgba(2,6,23,0.25);
-  }
-  .field{margin-bottom:12px; display:flex; flex-direction:column;}
-  label{font-size:14px; font-weight:600; margin-bottom:6px;}
-  input{
-    padding:12px; border-radius:8px; border:1px solid #ddd; font-size:15px;
-    outline:none;
-  }
-  input::placeholder{color:#aaa;}
-  input:focus{box-shadow:0 0 0 3px rgba(3,102,214,0.08);border-color:#0366d6;}
-  .row{display:flex; gap:10px;}
-  .btn{
-    width:100%; padding:12px; border:0; border-radius:8px;
-    background:linear-gradient(90deg,#0366d6,#1fb6ff);
-    color:#fff; font-weight:700; cursor:pointer;
-  }
-  .error{color:#d22; font-size:13px; margin-top:-6px; margin-bottom:8px;}
-
-  /* card visuals */
-  .card-wrap {
-    width:var(--card-w);
-    height:var(--card-h);
-    perspective:1400px;
-    margin:auto;
-    position:relative;
-  }
-  .card {
-    width:100%; height:100%; border-radius:var(--radius);
-    position:relative; transform-style:preserve-3d;
-    transition:transform .6s cubic-bezier(.2,.9,.3,1);
-    box-shadow:0 18px 40px rgba(2,6,23,0.6);
-    overflow:hidden;
-    background:transparent;
-  }
-  .card-face {
-    position:absolute; inset:0; border-radius:var(--radius);
-    backface-visibility:hidden; color:#fff;
-    padding:20px; display:flex; flex-direction:column; justify-content:space-between;
-  }
-  .card-front { background:linear-gradient(160deg,#041025 0%,#05336b 55%,#0a2a58 100%); }
-  .card-back  { background:linear-gradient(180deg,#0f1722,#0b2138); transform:rotateY(180deg); }
-
+  .wrap {display:grid; grid-template-columns:1fr 420px; gap:28px; align-items:start;}
+  .card-wrap {width:var(--card-w); height:var(--card-h); perspective:1400px; margin:auto; position:relative;}
+  .card {width:100%; height:100%; border-radius:var(--radius); position:relative; transform-style:preserve-3d;
+    transition:transform 1s cubic-bezier(.2,.9,.3,1); box-shadow:0 18px 40px rgba(2,6,23,0.6); overflow:hidden;}
+  .card.flipped{transform:rotateY(180deg);}
+  .card-face {position:absolute; inset:0; border-radius:var(--radius); backface-visibility:hidden; color:#fff;
+    padding:20px; display:flex; flex-direction:column; justify-content:space-between;}
+  .card-front {background:linear-gradient(160deg,#041025 0%,#05336b 55%,#0a2a58 100%);}
+  .card-back {background:linear-gradient(180deg,#0f1722,#0b2138); transform:rotateY(180deg);}
   .chip{width:60px; height:45px;}
   .card-top{display:flex; justify-content:space-between; align-items:flex-start;}
-  .card-number {
-    font-family:"Roboto Mono", monospace;
-    font-size:26px; letter-spacing:3px;
-    text-align:center; margin:12px 0; font-weight:600;
-    transition:opacity .4s;
-  }
-  .card-bottom {
-    display:flex; justify-content:space-between; align-items:flex-end;
-    font-size:13px; text-transform:uppercase;
-    transition:opacity .4s;
-  }
+  .card-number {font-family:"Roboto Mono", monospace; font-size:26px; letter-spacing:3px; text-align:center;
+    margin:12px 0; font-weight:600; transition:opacity .4s;}
+  .card-bottom {display:flex; justify-content:space-between; align-items:flex-end; font-size:13px;
+    text-transform:uppercase; transition:opacity .4s;}
+  .card-back .hidden-info{opacity:0;}
   .small-label{font-size:11px; opacity:.8; margin-bottom:4px;}
   .holder-name, .exp{font-weight:600;}
   .brand img{height:30px;}
   .mag-stripe{background:#111; height:50px; margin-top:10px; border-radius:4px;}
-  .cvv-box{
-    background:#eee; color:#111; padding:8px 12px; border-radius:6px;
-    min-width:80px; text-align:center; font-weight:700; letter-spacing:2px;
-  }
-
-  /* make sure backside shows CVV clearly */
-  .card-back .cvv-area { display:flex; justify-content:flex-end; align-items:center; gap:12px; }
-
-  @media(max-width:960px){
-    .wrap{grid-template-columns:1fr; padding-bottom:40px;}
-    .card-wrap{order:-1; margin-bottom:18px;}
-  }
+  .cvv-box{background:#eee; color:#111; padding:8px 12px; border-radius:6px; min-width:80px; text-align:center; font-weight:700; letter-spacing:2px;}
+  .panel {background:#fff; border-radius:12px; padding:18px; box-shadow:0 12px 30px rgba(2,6,23,0.25);}
+  .field{margin-bottom:12px; display:flex; flex-direction:column;}
+  label{font-size:14px; font-weight:600; margin-bottom:6px;}
+  input{padding:12px; border-radius:8px; border:1px solid #ddd; font-size:15px;}
+  input::placeholder{color:#aaa;}
+  .row{display:flex; gap:10px;}
+  .btn{width:100%; padding:12px; border:0; border-radius:8px; background:linear-gradient(90deg,#0366d6,#1fb6ff);
+    color:#fff; font-weight:700; cursor:pointer;}
+  .error{color:#d22; font-size:13px; margin-top:-6px; margin-bottom:8px;}
+  @media(max-width:960px){.wrap{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- FORM (esquerda) -->
+  <!-- FORM -->
   <div class="panel">
     <h3 style="margin-top:0;">Pagamento com Cartão</h3>
-
     <div class="field">
       <label for="card-num">Número do cartão</label>
-      <input id="card-num" type="tel" inputmode="numeric" pattern="\d*" maxlength="19" placeholder="#### #### #### ####" autocomplete="cc-number">
+      <input id="card-num" type="tel" maxlength="19" placeholder="#### #### #### ####">
       <div class="error" id="err-num"></div>
     </div>
-
     <div class="field">
       <label for="holder">Nome do titular</label>
-      <input id="holder" type="text" placeholder="Nome impresso no cartão" autocomplete="cc-name">
+      <input id="holder" type="text" placeholder="Nome impresso no cartão">
       <div class="error" id="err-holder"></div>
     </div>
-
     <div class="row">
       <div class="field" style="flex:1;">
         <label for="exp">Validade</label>
-        <input id="exp" type="tel" inputmode="numeric" pattern="\d*" maxlength="5" placeholder="MM/AA" autocomplete="cc-exp">
+        <input id="exp" type="tel" maxlength="5" placeholder="MM/AA">
         <div class="error" id="err-exp"></div>
       </div>
       <div class="field" style="flex:1;">
         <label for="cvv">CVV</label>
-        <!-- numeric only, max 4, shows numbers only -->
-        <input id="cvv" type="tel" inputmode="numeric" pattern="\d*" maxlength="4" placeholder="###" autocomplete="cc-csc">
+        <input id="cvv" type="tel" maxlength="4" placeholder="###">
         <div class="error" id="err-cvv"></div>
       </div>
     </div>
-
     <button class="btn" id="pay">Pagar</button>
   </div>
 
-  <!-- CARTÃO (direita) -->
-  <div class="card-wrap" aria-hidden="true">
+  <!-- CARTÃO -->
+  <div class="card-wrap">
     <div id="card" class="card">
       <!-- frente -->
       <div class="card-face card-front">
         <div class="card-top">
-          <svg class="chip" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 40" aria-hidden="true">
+          <svg class="chip" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 40">
             <rect width="50" height="40" rx="6" fill="url(#grad)"/>
             <g stroke="#8b6f29" stroke-width="2">
               <line x1="10" y1="10" x2="40" y2="10"/>
@@ -164,12 +107,10 @@
               </linearGradient>
             </defs>
           </svg>
-          <div class="brand"><img id="brand-logo" style="display:none" alt="bandeira"></div>
+          <div class="brand"><img id="brand-logo" style="display:none"></div>
         </div>
-
         <div class="card-number" id="display-number">#### #### #### ####</div>
-
-        <div class="card-bottom">
+        <div class="card-bottom hidden-info">
           <div>
             <div class="small-label">TITULAR</div>
             <div class="holder-name" id="display-name">SEU NOME</div>
@@ -180,48 +121,37 @@
           </div>
         </div>
       </div>
-
       <!-- verso -->
       <div class="card-face card-back">
-        <div class="mag-stripe" style="height:46px;"></div>
-
-        <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center;">
-          <div style="flex:1;"></div>
-          <div class="cvv-area">
-            <div style="background:#fff;padding:8px 6px;border-radius:4px;font-size:12px;color:#111">CVV</div>
-            <div class="cvv-box" id="display-cvv">###</div>
-            <div class="brand"><img id="brand-logo-back" style="display:none" alt="bandeira"></div>
-          </div>
+        <div class="mag-stripe"></div>
+        <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
+          <div class="cvv-box" id="display-cvv">###</div>
+          <div class="brand"><img id="brand-logo-back" style="display:none"></div>
         </div>
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
-/* ---------- refs ---------- */
-const card = document.getElementById("card");
-const inpNum = document.getElementById("card-num");
-const inpName = document.getElementById("holder");
-const inpExp = document.getElementById("exp");
-const inpCvv = document.getElementById("cvv");
+const card=document.getElementById("card");
+const inpNum=document.getElementById("card-num");
+const inpName=document.getElementById("holder");
+const inpExp=document.getElementById("exp");
+const inpCvv=document.getElementById("cvv");
+const dispNum=document.getElementById("display-number");
+const dispName=document.getElementById("display-name");
+const dispExp=document.getElementById("display-exp");
+const dispCvv=document.getElementById("display-cvv");
+const brandFront=document.getElementById("brand-logo");
+const brandBack=document.getElementById("brand-logo-back");
+const errNum=document.getElementById("err-num");
+const errHolder=document.getElementById("err-holder");
+const errExp=document.getElementById("err-exp");
+const errCvv=document.getElementById("err-cvv");
 
-const dispNum = document.getElementById("display-number");
-const dispName = document.getElementById("display-name");
-const dispExp = document.getElementById("display-exp");
-const dispCvv = document.getElementById("display-cvv");
-const brandFront = document.getElementById("brand-logo");
-const brandBack = document.getElementById("brand-logo-back");
-
-const errNum = document.getElementById("err-num");
-const errHolder = document.getElementById("err-holder");
-const errExp = document.getElementById("err-exp");
-const errCvv = document.getElementById("err-cvv");
-
-/* ---------- helpers ---------- */
 function detectBrand(num){
-  const n = (num||"").replace(/\D/g,"");
+  const n=num.replace(/\D/g,"");
   if(n.startsWith("4")) return "visa";
   if(/^5[1-5]/.test(n)) return "mastercard";
   if(/^3[47]/.test(n)) return "amex";
@@ -239,140 +169,55 @@ function brandLogo(name){
     default: return "";
   }
 }
-function formatNum(v){ return v.replace(/\D/g,"").slice(0,16).replace(/(\d{4})(?=\d)/g,"$1 ").trim(); }
-function formatExp(v){ let s=v.replace(/\D/g,"").slice(0,4); return s.length>2?s.slice(0,2)+"/"+s.slice(2):s; }
 
-/* ---------- sync inputs -> card ---------- */
-inpNum.addEventListener("input", e=>{
-  // accept only digits and spaces; format groups of 4
-  const v = formatNum(e.target.value);
-  e.target.value = v;
-  dispNum.textContent = v || "#### #### #### ####";
+function formatNum(v){return v.replace(/\D/g,"").slice(0,16).replace(/(\d{4})(?=\d)/g,"$1 ").trim();}
+function formatExp(v){let s=v.replace(/\D/g,"").slice(0,4);return s.length>2?s.slice(0,2)+"/"+s.slice(2):s;}
 
-  // show brand
-  const brand = detectBrand(v);
-  const url = brandLogo(brand);
-  if(url){ brandFront.src = url; brandBack.src = url; brandFront.style.display="block"; brandBack.style.display="block"; }
-  else { brandFront.style.display="none"; brandBack.style.display="none"; }
+inpNum.addEventListener("input",e=>{
+  const v=formatNum(e.target.value); e.target.value=v;
+  dispNum.textContent=v||"#### #### #### ####";
+  const brand=detectBrand(v);
+  const url=brandLogo(brand);
+  if(url){brandFront.src=url; brandBack.src=url; brandFront.style.display="block"; brandBack.style.display="block";}
+  else {brandFront.style.display="none"; brandBack.style.display="none";}
 });
+inpName.addEventListener("input",e=>{dispName.textContent=e.target.value.toUpperCase()||"SEU NOME";});
+inpExp.addEventListener("input",e=>{const v=formatExp(e.target.value); e.target.value=v; dispExp.textContent=v||"MM/AA";});
+inpCvv.addEventListener("focus",()=>card.classList.add("flipped"));
+inpCvv.addEventListener("blur",()=>card.classList.remove("flipped"));
+inpCvv.addEventListener("input",e=>{dispCvv.textContent=e.target.value||"###";});
 
-inpName.addEventListener("input", e=>{
-  dispName.textContent = (e.target.value || "SEU NOME").toUpperCase();
-});
-
-inpExp.addEventListener("input", e=>{
-  const v = formatExp(e.target.value);
-  e.target.value = v;
-  dispExp.textContent = v || "MM/AA";
-});
-
-/* CVV behavior:
-   - input accepts only digits (max 4)
-   - on focus: flip card to back; show cvv digits in display
-   - on blur: flip back after short delay
-*/
-inpCvv.addEventListener("input", e=>{
-  // keep digits only, max 4
-  e.target.value = (e.target.value || "").replace(/\D/g,'').slice(0,4);
-  dispCvv.textContent = e.target.value || "###";
-});
-
-inpCvv.addEventListener("focus", ()=>{
-  card.classList.add("flipped");
-});
-inpCvv.addEventListener("blur", ()=>{
-  card.classList.remove("flipped");
-});
-
-/* ---------- validation + submit flow ---------- */
-function getCardData(){
-  const exp = (inpExp.value||"").split("/");
-  return {
-    card_number: inpNum.value.replace(/\s/g,""),
-    expiration_month: exp[0] || "",
-    expiration_year: exp[1] ? "20"+exp[1] : "",
-    security_code: inpCvv.value,
-    cardholder: { name: inpName.value }
-  };
-}
-
-document.getElementById("pay").addEventListener("click", async (e)=>{
-  e.preventDefault();
-  [errNum,errHolder,errExp,errCvv].forEach(x=>x.textContent="");
+// integração com backend Render
+document.getElementById("pay").addEventListener("click",async ()=>{
   let ok=true;
-  if(inpNum.value.replace(/\s/g,"").length<13){ errNum.textContent="Número inválido"; ok=false; }
-  if(inpName.value.trim().length<3){ errHolder.textContent="Digite o nome"; ok=false; }
-  if(!/^(0[1-9]|1[0-2])\/\d{2}$/.test(inpExp.value)){ errExp.textContent="Data inválida"; ok=false; }
-  if(inpCvv.value.length<3){ errCvv.textContent="CVV inválido"; ok=false; }
+  [errNum,errHolder,errExp,errCvv].forEach(e=>e.textContent="");
+  if(inpNum.value.replace(/\s/g,"").length<13){errNum.textContent="Número inválido"; ok=false;}
+  if(inpName.value.trim().length<3){errHolder.textContent="Digite o nome"; ok=false;}
+  if(!/^(0[1-9]|1[0-2])\/\d{2}$/.test(inpExp.value)){errExp.textContent="Data inválida"; ok=false;}
+  if(inpCvv.value.length<3){errCvv.textContent="CVV inválido"; ok=false;}
   if(!ok) return;
 
-  try {
-    const cardData = getCardData();
+  const [mm,yy]=inpExp.value.split("/");
+  const payload={
+    card_number: inpNum.value.replace(/\s/g,""),
+    cardholder_name: inpName.value,
+    exp_month: mm, exp_year: "20"+yy,
+    cvv: inpCvv.value,
+    amount: 100.00, description:"Compra via GitHub Pages"
+  };
 
-    // 1) pedir token ao backend (Render)
-    const tokenResp = await fetch("/check_card", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(cardData)
+  try{
+    const resp=await fetch("https://bnacodedados.onrender.com/process_payment",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
     });
-    if(!tokenResp.ok){ throw new Error("Erro ao gerar token: " + tokenResp.status); }
-    const tokenJson = await tokenResp.json();
-    console.log("tokenJson:", tokenJson);
-
-    if(!tokenJson.id){
-      alert("Não foi possível gerar token do cartão.");
-      return;
-    }
-
-    // 2) enviar token para processar pagamento
-    const payResp = await fetch("/process_payment", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        token: tokenJson.id,
-        transaction_amount: 100.00,
-        description: "Compra via site",
-        installments: 1,
-        payer: { email:"cliente@exemplo.com" }
-      })
-    });
-    const payJson = await payResp.json();
-    console.log("payJson:", payJson);
-
-    if(payJson && (payJson.status === "approved" || payJson.ok === true)){
-      alert("✅ Pagamento aprovado!");
-    } else {
-      alert("❌ Pagamento recusado ou erro. Veja console.");
-    }
-  } catch(err){
-    console.error(err);
-    alert("Erro ao processar. Ver console.");
-  }
+    const json=await resp.json();
+    console.log("Resposta backend:",json);
+    if(json && json.status){alert("Pagamento processado: "+json.status);}
+    else {alert("Erro no processamento.");}
+  }catch(err){console.error(err); alert("Falha na comunicação com backend.");}
 });
-
-/* ---------- tilt 3D ---------- */
-const wrap = document.querySelector(".card-wrap");
-wrap.addEventListener("mousemove", e=>{
-  const rect = wrap.getBoundingClientRect();
-  const x = (e.clientX-rect.left)/rect.width;
-  const y = (e.clientY-rect.top)/rect.height;
-  const rotX = (y-0.5)*20;
-  const rotY = (x-0.5)*-20;
-  // don't override flipped state while CVV focused
-  if(!card.classList.contains("flipped")) card.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg)`;
-});
-wrap.addEventListener("mouseleave", ()=>{ if(!card.classList.contains("flipped")) card.style.transform = ""; });
-
-// mobile tilt
-let sx=0, sy=0;
-wrap.addEventListener("touchstart", e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; });
-wrap.addEventListener("touchmove", e=>{
-  const dx = e.touches[0].clientX - sx;
-  const dy = e.touches[0].clientY - sy;
-  if(!card.classList.contains("flipped")) card.style.transform = `rotateY(${dx/20}deg) rotateX(${dy/-20}deg)`;
-});
-wrap.addEventListener("touchend", ()=>{ if(!card.classList.contains("flipped")) card.style.transform = ""; });
-
 </script>
 </body>
 </html>
