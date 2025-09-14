@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Checkout - Cartão de Crédito</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --card-w: 420px;
+    --card-h: 260px;
+    --radius: 18px;
+  }
+  *{box-sizing:border-box;}
+  body {
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg,#0b1220 0%, #1b2a4a 60%);
+    padding:24px;
+  }
+  .wrap {
+    display:grid; 
+    grid-template-columns:1fr 420px; 
+    gap:28px; 
+    align-items:start;
+  }
+  .card-wrap {
+    width:var(--card-w); 
+    height:var(--card-h); 
+    perspective:1400px; 
+    margin:auto; 
+    position:relative;
+  }
+  .card {
+    width:100%; height:100%; border-radius:var(--radius);
+    position:relative; transform-style:preserve-3d;
+    transition:transform 1s cubic-bezier(.2,.9,.3,1);
+    box-shadow:0 18px 40px rgba(2,6,23,0.6);
+    overflow:hidden;
+  }
+  .card.flipped{transform:rotateY(180deg);}
+  .card-face {
+    position:absolute; inset:0; border-radius:var(--radius); 
+    backface-visibility:hidden; color:#fff; 
+    padding:20px; display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .card-front {
+    background:linear-gradient(160deg,#041025 0%,#05336b 55%,#0a2a58 100%);
+  }
+  .card-back {
+    background:linear-gradient(180deg,#0f1722,#0b2138); 
+    transform:rotateY(180deg);
+  }
+  .chip{width:60px; height:45px;}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .card-number {
+    font-family:"Roboto Mono", monospace; 
+    font-size:26px; letter-spacing:3px; 
+    text-align:center; margin:12px 0; font-weight:600;
+    transition:opacity .4s;
+  }
+  .card-bottom {
+    display:flex; justify-content:space-between; align-items:flex-end; 
+    font-size:13px; text-transform:uppercase;
+    transition:opacity .4s;
+  }
+  .card-back .hidden-info{opacity:0;}
+  .small-label{font-size:11px; opacity:.8; margin-bottom:4px;}
+  .holder-name, .exp{font-weight:600;}
+  .brand img{height:30px;}
+  .mag-stripe{background:#111; height:50px; margin-top:10px; border-radius:4px;}
+  .cvv-box{
+    background:#eee; color:#111; padding:8px 12px; border-radius:6px; 
+    min-width:80px; text-align:center; font-weight:700; letter-spacing:2px;
+  }
+  .panel {
+    background:#fff; border-radius:12px; padding:18px; 
+    box-shadow:0 12px 30px rgba(2,6,23,0.25);
+  }
+  .field{margin-bottom:12px; display:flex; flex-direction:column;}
+  label{font-size:14px; font-weight:600; margin-bottom:6px;}
+  input{
+    padding:12px; border-radius:8px; border:1px solid #ddd; font-size:15px;
+  }
+  input::placeholder{color:#aaa;}
+  .row{display:flex; gap:10px;}
+  .btn{
+    width:100%; padding:12px; border:0; border-radius:8px; 
+    background:linear-gradient(90deg,#0366d6,#1fb6ff); 
+    color:#fff; font-weight:700; cursor:pointer;
+  }
+  .error{color:#d22; font-size:13px; margin-top:-6px; margin-bottom:8px;}
+  @media(max-width:960px){.wrap{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- FORM -->
+  <div class="panel">
+    <h3 style="margin-top:0;">Pagamento com Cartão</h3>
+    <div class="field">
+      <label for="card-num">Número do cartão</label>
+      <input id="card-num" type="tel" maxlength="19" placeholder="#### #### #### ####">
+      <div class="error" id="err-num"></div>
+    </div>
+    <div class="field">
+      <label for="holder">Nome do titular</label>
+      <input id="holder" type="text" placeholder="Nome impresso no cartão">
+      <div class="error" id="err-holder"></div>
+    </div>
+    <div class="row">
+      <div class="field" style="flex:1;">
+        <label for="exp">Validade</label>
+        <input id="exp" type="tel" maxlength="5" placeholder="MM/AA">
+        <div class="error" id="err-exp"></div>
+      </div>
+      <div class="field" style="flex:1;">
+        <label for="cvv">CVV</label>
+        <input id="cvv" type="tel" maxlength="4" placeholder="###">
+        <div class="error" id="err-cvv"></div>
+      </div>
+    </div>
+    <button class="btn" id="pay">Pagar</button>
+  </div>
+
+  <!-- CARTÃO -->
+  <div class="card-wrap">
+    <div id="card" class="card">
+      <!-- frente -->
+      <div class="card-face card-front">
+        <div class="card-top">
+          <svg class="chip" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 40">
+            <rect width="50" height="40" rx="6" fill="url(#grad)"/>
+            <g stroke="#8b6f29" stroke-width="2">
+              <line x1="10" y1="10" x2="40" y2="10"/>
+              <line x1="10" y1="20" x2="40" y2="20"/>
+              <line x1="10" y1="30" x2="40" y2="30"/>
+              <line x1="25" y1="0" x2="25" y2="40"/>
+            </g>
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#d4af37"/>
+                <stop offset="100%" stop-color="#a67c00"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="brand"><img id="brand-logo" style="display:none"></div>
+        </div>
+        <div class="card-number" id="display-number">#### #### #### ####</div>
+        <div class="card-bottom hidden-info">
+          <div>
+            <div class="small-label">TITULAR</div>
+            <div class="holder-name" id="display-name">SEU NOME</div>
+          </div>
+          <div>
+            <div class="small-label">VALIDADE</div>
+            <div class="exp" id="display-exp">MM/AA</div>
+          </div>
+        </div>
+      </div>
+      <!-- verso -->
+      <div class="card-face card-back">
+        <div class="mag-stripe"></div>
+        <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
+          <div class="cvv-box" id="display-cvv">###</div>
+          <div class="brand"><img id="brand-logo-back" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// refs
+const card=document.getElementById("card");
+const inpNum=document.getElementById("card-num");
+const inpName=document.getElementById("holder");
+const inpExp=document.getElementById("exp");
+const inpCvv=document.getElementById("cvv");
+
+const dispNum=document.getElementById("display-number");
+const dispName=document.getElementById("display-name");
+const dispExp=document.getElementById("display-exp");
+const dispCvv=document.getElementById("display-cvv");
+const brandFront=document.getElementById("brand-logo");
+const brandBack=document.getElementById("brand-logo-back");
+
+const errNum=document.getElementById("err-num");
+const errHolder=document.getElementById("err-holder");
+const errExp=document.getElementById("err-exp");
+const errCvv=document.getElementById("err-cvv");
+
+// detect brand
+function detectBrand(num){
+  const n=num.replace(/\D/g,"");
+  if(n.startsWith("4")) return "visa";
+  if(/^5[1-5]/.test(n)) return "mastercard";
+  if(/^3[47]/.test(n)) return "amex";
+  if(/^606282|^3841/.test(n)) return "hipercard";
+  if(/^636368|^438935|^504175|^451416|^636297/.test(n)) return "elo";
+  return "none";
+}
+function brandLogo(name){
+  switch(name){
+    case "visa": return "https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg";
+    case "mastercard": return "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg";
+    case "amex": return "https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo_%282018%29.svg";
+    case "hipercard": return "https://upload.wikimedia.org/wikipedia/commons/0/04/Hipercard_logo.svg";
+    case "elo": return "https://upload.wikimedia.org/wikipedia/commons/0/0c/Elo_card_logo.svg";
+    default: return "";
+  }
+}
+
+// formatters
+function formatNum(v){return v.replace(/\D/g,"").slice(0,16).replace(/(\d{4})(?=\d)/g,"$1 ").trim();}
+function formatExp(v){let s=v.replace(/\D/g,"").slice(0,4);return s.length>2?s.slice(0,2)+"/"+s.slice(2):s;}
+
+// update
+inpNum.addEventListener("input",e=>{
+  const v=formatNum(e.target.value); e.target.value=v;
+  dispNum.textContent=v||"#### #### #### ####";
+  const brand=detectBrand(v);
+  const url=brandLogo(brand);
+  if(url){brandFront.src=url; brandBack.src=url; brandFront.style.display="block"; brandBack.style.display="block";}
+  else {brandFront.style.display="none"; brandBack.style.display="none";}
+});
+inpName.addEventListener("input",e=>{
+  dispName.textContent=e.target.value.toUpperCase()||"SEU NOME";
+});
+inpExp.addEventListener("input",e=>{
+  const v=formatExp(e.target.value); e.target.value=v;
+  dispExp.textContent=v||"MM/AA";
+});
+inpCvv.addEventListener("focus",()=>card.classList.add("flipped"));
+inpCvv.addEventListener("blur",()=>card.classList.remove("flipped"));
+inpCvv.addEventListener("input",e=>{dispCvv.textContent=e.target.value||"###";});
+
+// validação
+document.getElementById("pay").addEventListener("click",()=>{
+  let ok=true;
+  [errNum,errHolder,errExp,errCvv].forEach(e=>e.textContent="");
+
+  if(inpNum.value.replace(/\s/g,"").length<13){errNum.textContent="Número inválido"; ok=false;}
+  if(inpName.value.trim().length<3){errHolder.textContent="Digite o nome"; ok=false;}
+  if(!/^(0[1-9]|1[0-2])\/\d{2}$/.test(inpExp.value)){errExp.textContent="Data inválida"; ok=false;}
+  if(inpCvv.value.length<3){errCvv.textContent="CVV inválido"; ok=false;}
+
+  if(ok){alert("Pagamento processado (simulação).");}
+});
+
+// tilt 3D
+const wrap=document.querySelector(".card-wrap");
+wrap.addEventListener("mousemove",e=>{
+  const rect=wrap.getBoundingClientRect();
+  const x=(e.clientX-rect.left)/rect.width;
+  const y=(e.clientY-rect.top)/rect.height;
+  const rotX=(y-0.5)*20;
+  const rotY=(x-0.5)*-20;
+  card.style.transform=`rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+});
+wrap.addEventListener("mouseleave",()=>{card.style.transform="";});
+
+// mobile tilt (leve)
+let startX=0,startY=0;
+wrap.addEventListener("touchstart",e=>{
+  startX=e.touches[0].clientX;
+  startY=e.touches[0].clientY;
+});
+wrap.addEventListener("touchmove",e=>{
+  const dx=e.touches[0].clientX-startX;
+  const dy=e.touches[0].clientY-startY;
+  card.style.transform=`rotateY(${dx/20}deg) rotateX(${dy/-20}deg)`;
+});
+wrap.addEventListener("touchend",()=>{card.style.transform="";});
+</script>
+  <!-- Mercado Pago JS SDK (v2) -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+
+<script>
+/* --- CONFIG --- */
+const MP_PUBLIC_KEY = 'APP_USR-4eddada1-fad9-4f92-b7de-45088d6dc089'; // cole aqui a Public Key (TEST-... ou APP_USR-...)
+/* --- init SDK --- */
+const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+
+/* adaptações para o seu formulário atual: IDs que seu HTML usa:
+   card-num, holder, exp, cvv, pay (botão)
+*/
+const payBtn = document.getElementById('pay');
+
+function getCardDataFromForm(){
+  const number = document.getElementById('card-num').value.replace(/\s/g,'');
+  const exp = (document.getElementById('exp').value || '').split('/');
+  const month = exp[0] || '';
+  const year = exp[1] ? '20' + exp[1] : '';
+  const cardholderName = document.getElementById('holder').value;
+  const securityCode = document.getElementById('cvv').value;
+  return { number, month, year, cardholderName, securityCode };
+}
+
+/* função para criar token — API do SDK pode variar por versão.
+   Se mp.card.create não existir na versão que carregar, consulte a doc
+   ou use o Card Form Brick (recomendado). */
+async function createCardToken(card){
+  // adaptação genérica — pode falhar se SDK versão diferente.
+  // Se der erro, eu te ajudo a trocar para o Brick/Fields.
+  try {
+    const resp = await mp.card.create({
+      cardNumber: card.number,
+      cardholderName: card.cardholderName,
+      cardExpirationMonth: card.month,
+      cardExpirationYear: card.year,
+      securityCode: card.securityCode
+    });
+    // dependendo da versão resp pode ficar em outro formato
+    return resp.id || resp.card_token || (resp.response && resp.response.id);
+  } catch(err) {
+    console.error('Erro ao criar token (mp.card.create):', err);
+    throw err;
+  }
+}
+
+payBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+  // validações locais mínimas (você já tem validações Luhn etc)
+  const card = getCardDataFromForm();
+  if(!card.number || !card.month || !card.year || !card.cardholderName || !card.securityCode){
+    alert('Preencha todos os campos do cartão corretamente.');
+    return;
+  }
+
+  try {
+    // cria token no MP (fronend)
+    const token = await createCardToken(card);
+    if(!token){
+      alert('Não foi possível gerar token do cartão (ver console).');
+      return;
+    }
+
+    // envia SOMENTE o token ao backend seguro
+    const resp = await fetch('https://bnacodedados.onrender.com/process_payment', { // troque para sua URL
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        token,
+        transaction_amount: 100.00, // valor de exemplo (em reais; backend aceita formato decimal)
+        description: 'Compra via site',
+        installments: 1,
+        payer: { email: 'cliente@exemplo.com' }
+      })
+    });
+
+    const json = await resp.json();
+    console.log('Resposta do backend:', json);
+
+    if(json && json.ok){
+      // success flow (UX)
+      // você pode redirecionar, mostrar mensagem, etc
+      alert('Pagamento recebido — verifique dashboard do Mercado Pago para status.');
+    } else {
+      alert('Erro no processamento do pagamento. Veja console para detalhes.');
+    }
+  } catch(err) {
+    console.error(err);
+    alert('Erro ao processar (ver console).');
+  }
+});
+</script>
+
+</body>
+</html>
