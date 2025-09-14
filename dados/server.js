@@ -9,20 +9,18 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// --- diretório base (para servir index.html) ---
+// Corrigir __dirname (pois estamos usando ESModules)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// token do Mercado Pago (configure no Render -> Environment Variables)
 const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN;
 
-// rota raiz → abre o index.html
-app.use(express.static(path.join(__dirname, "public")));
+// Rota GET / → serve o index.html
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// rota para validar cartão
+// Rota para validar cartão
 app.post("/check_card", async (req, res) => {
   try {
     const { card_number } = req.body;
@@ -31,7 +29,7 @@ app.post("/check_card", async (req, res) => {
       return res.status(400).json({ error: "Número do cartão é obrigatório" });
     }
 
-    const response = await fetch(`https://api.mercadopago.com/v1/card_tokens`, {
+    const response = await fetch("https://api.mercadopago.com/v1/card_tokens", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,17 +54,17 @@ app.post("/check_card", async (req, res) => {
   }
 });
 
-// rota para processar pagamento
+// Rota para processar pagamento
 app.post("/process_payment", async (req, res) => {
   try {
-    const { token, transaction_amount, description, installments, payer } =
+    const { token, transaction_amount, installments, payment_method_id, payer } =
       req.body;
 
-    if (!token) {
-      return res.status(400).json({ error: "Token do cartão é obrigatório" });
+    if (!token || !transaction_amount || !payment_method_id || !payer) {
+      return res.status(400).json({ error: "Dados de pagamento incompletos" });
     }
 
-    const response = await fetch(`https://api.mercadopago.com/v1/payments`, {
+    const response = await fetch("https://api.mercadopago.com/v1/payments", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -75,9 +73,8 @@ app.post("/process_payment", async (req, res) => {
       body: JSON.stringify({
         token,
         transaction_amount,
-        description,
         installments,
-        payment_method_id: "visa", // simplificado; MP detecta no token
+        payment_method_id,
         payer,
       }),
     });
@@ -90,8 +87,8 @@ app.post("/process_payment", async (req, res) => {
   }
 });
 
-// start server
+// Porta dinâmica (Render exige process.env.PORT)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
